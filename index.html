@@ -8,87 +8,176 @@
   <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
-<header class="masthead">
-  <div class="container">
-    <div class="brand">
-      <img class="avatar" src="assets/images/profile.jpg" alt="Di Zhang" onerror="this.src='assets/images/avatar-placeholder.svg'">
-      <div>
-        <h1>Di Zhang</h1>
-        <p>Researcher (Architecture & AI), Harbin Institute of Technology</p>
-        <p class="meta">
-          <span>Singapore</span> ·
-          <a href="mailto:22s034017@stu.hit.edu.cn">Email</a> ·
-          <a href="https://scholar.google.com/" target="_blank">Google Scholar</a> ·
-          <a href="https://github.com/" target="_blank">GitHub</a> ·
-          <a href="https://www.linkedin.com/" target="_blank">LinkedIn</a>
-        </p>
+  <div class="page">
+    <header class="site-hero">
+      <div class="container hero-grid">
+        <div class="hero-meta">
+          <p class="hero-name">Di Zhang</p>
+          <p class="hero-role">Human–Building Intelligence · HIT</p>
+          <p class="hero-location">Based in Singapore</p>
+        </div>
+        <div class="hero-content">
+          <h1>Designing LLM-powered comfort systems for future-ready buildings.</h1>
+          <p class="hero-lead">I build semantic agents that read Brick/IFC graphs, sense occupants, and negotiate façade / PV operations for healthier, more equitable environments.</p>
+          <div class="hero-actions">
+            <a class="pill" href="#projects">See projects</a>
+            <a class="pill ghost" href="assets/Di_Zhang_Visual_CV_Academic.pdf">Download CV</a>
+            <a class="pill" href="#contact">Contact</a>
+          </div>
+          <ul class="hero-links">
+            <li><a href="mailto:22s034017@stu.hit.edu.cn">Email</a></li>
+            <li><a href="https://scholar.google.com/" target="_blank">Google Scholar</a></li>
+            <li><a href="https://github.com/" target="_blank">GitHub</a></li>
+            <li><a href="https://www.linkedin.com/" target="_blank">LinkedIn</a></li>
+          </ul>
+        </div>
       </div>
-    </div>
-    <nav class="tabs">
-      <a class="active" href="#about">About</a>
-      <a href="#news">News</a>
-      <a href="#publications">Publications</a>
-      <a href="#software">Software</a>
-      <a href="#cv">CV</a>
-    </nav>
+    </header>
+
+    <main class="container content-stack">
+      <section id="about" class="panel section">
+          <h2>About</h2>
+          <p>My research bridges <strong>architectural engineering</strong> and <strong>AI</strong>, focusing on sensing occupants, reasoning over Brick/IFC knowledge graphs, and deploying agentic control strategies for healthy and net-zero buildings.</p>
+          <ul>
+            <li>Master's candidate, School of Architecture, HIT (advised by Prof. Lei Hou).</li>
+            <li>Collaborating with HKUST on semantic AI for campus-scale digital twins.</li>
+            <li>Leading Prima-databot, a tool-augmented LLM agent that plans queries, writes code, and validates results for building data.</li>
+          </ul>
+      </section>
+
+      <section id="news" class="panel section">
+        <h2>Recent news</h2>
+        <ul class="news-simple">
+          <li>
+            <div class="news-date">Sep 2025</div>
+            <div class="news-text">Our paper “MMEdge: Accelerating On-device Multimodal Inference via Pipelined Sensing and Encoding” accepted by SenSys 2026.</div>
+          </li>
+          <li>
+            <div class="news-date">Jul 2025</div>
+            <div class="news-text">Received Early Career Scheme Fund from HK RGC; congrats to Yizhen for winning the HK PhD Fellowship.</div>
+          </li>
+          <li>
+            <div class="news-date">May 2025</div>
+            <div class="news-text">Honored as Distinguished TPC member of SenSys 2025 and Best Paper at FMSys 2025.</div>
+          </li>
+          <li>
+            <div class="news-date">Mar 2025</div>
+            <div class="news-text">Co-organizing the Networking Networking Women Workshop at ACM MobiSys 2025; mentor/poster applications open.</div>
+          </li>
+          <li>
+            <div class="news-date">Jan 2025</div>
+            <div class="news-text">Multiple papers on multimodal learning and LLMs accepted (MMBind @ SenSys’25, SensorBench @ HotMobile’25, InfoMAE @ WWW’25, TSFMs @ BuildSys’24).</div>
+          </li>
+        </ul>
+      </section>
+
+      <section id="publications" class="panel section">
+          <h2>Selected publications</h2>
+          <ol class="pubs">
+            <li>
+              <strong>Adaptive façade control via gaze estimation & expression recognition.</strong>
+              <span>Building Simulation (major revision)</span>
+              <p>Proposes a multimodal occupant comfort model that feeds a reinforcement-based façade agent.</p>
+            </li>
+            <li>
+              <strong>Prima-databot: LLM agent for Brick-based time-series querying.</strong>
+              <span>Journal of Building Engineering (under review)</span>
+              <p>Planner–Coder–Verifier workflow for semantic queries over building telemetry.</p>
+            </li>
+            <li>
+              <strong>Multi-objective optimization for residential green space design.</strong>
+              <span>Sustainable Cities and Society</span>
+            </li>
+            <li>
+              <strong>PV-GPT: Natural-language PV data querying.</strong>
+              <span>Manuscript in preparation</span>
+            </li>
+            <li>
+              <strong>HAR for elderly care: literature review.</strong>
+              <span>CEB-ASC 2024 (oral)</span>
+            </li>
+          </ol>
+      </section>
+
+      <section id="projects" class="panel section projects-section">
+        <div class="section-heading">
+          <h2>Projects</h2>
+          <p class="mini-link">Curated works — each tile links to paper, slides, and video.</p>
+        </div>
+        <div class="project-wall">
+          <figure class="project-piece">
+            <img src="https://images.unsplash.com/photo-1470145318698-cb03732f5ddf?auto=format&fit=crop&w=1600&q=70" alt="Prima-databot visualization board">
+            <figcaption>
+              <p class="project-label">[Agentic AI]</p>
+              <h3>Prima-databot</h3>
+              <p class="project-meta">Journal of Building Engineering.</p>
+              <ul class="resource-links inline">
+                <li><a href="https://example.com/prima-paper.pdf" target="_blank">Paper</a></li>
+                <li><a href="https://example.com/prima-slides.pdf" target="_blank">Slides</a></li>
+                <li><a href="https://youtu.be/dQw4w9WgXcQ" target="_blank">Video</a></li>
+              </ul>
+            </figcaption>
+          </figure>
+
+          <figure class="project-piece">
+            <img src="https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=1600&q=70" alt="PV-GPT dashboard">
+            <figcaption>
+              <p class="project-label">[Energy systems]</p>
+              <h3>PV-GPT</h3>
+              <p class="project-meta">Multi-agent PV data pipeline with synthetic fault datasets and rubric-based scoring.</p>
+              <ul class="resource-links inline">
+                <li><a href="https://example.com/pvgpt-paper.pdf" target="_blank">Paper</a></li>
+                <li><a href="https://example.com/pvgpt-slides.pdf" target="_blank">Slides</a></li>
+                <li><a href="https://example.com/pvgpt-demo.mp4" target="_blank">Video</a></li>
+              </ul>
+            </figcaption>
+          </figure>
+
+          <figure class="project-piece">
+            <img src="https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=70" alt="Layout-Agent storyboard">
+            <figcaption>
+              <p class="project-label">[Design automation]</p>
+              <h3>Layout-Agent</h3>
+              <p class="project-meta">Prompt suite guiding housing layout generation with adjacency benchmarking and critique.</p>
+              <ul class="resource-links inline">
+                <li><a href="https://example.com/layout-paper.pdf" target="_blank">Paper</a></li>
+                <li><a href="https://example.com/layout-slides.pdf" target="_blank">Slides</a></li>
+                <li><a href="https://example.com/layout-demo.mp4" target="_blank">Video</a></li>
+              </ul>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="contact" class="panel section">
+        <h2>Contact</h2>
+        <p>Always happy to chat about human–building intelligence, semantic digital twins, or collaborative research.</p>
+        <ul class="contact-list">
+          <li>
+            <span>Email</span>
+            <a href="mailto:22s034017@stu.hit.edu.cn">22s034017@stu.hit.edu.cn</a>
+          </li>
+          <li>
+            <span>Google Scholar</span>
+            <a href="https://scholar.google.com/" target="_blank">scholar.google.com</a>
+          </li>
+          <li>
+            <span>LinkedIn</span>
+            <a href="https://www.linkedin.com/" target="_blank">linkedin.com/in/dizhang</a>
+          </li>
+          <li>
+            <span>GitHub</span>
+            <a href="https://github.com/" target="_blank">@zhang-ai</a>
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2025 Di Zhang · Inspired by AcademicPages <a href="https://github.com/WalterZWang/walterzwang.github.io" target="_blank">template</a>.</p>
+      </div>
+    </footer>
   </div>
-</header>
-
-<main class="container">
-  <section id="about" class="section">
-    <h2>About me</h2>
-    <ul>
-      <li>I am a Master's graduate at Harbin Institute of Technology (HIT). My work bridges <strong>computer vision</strong>, <strong>LLM agents</strong>, and <strong>building systems</strong> for human–building intelligence.</li>
-      <li>Undergraduate top performer (multiple national scholarships; international competition awards). I actively publish in Q1 journals and international conferences.</li>
-      <li>My current focus: adaptive façade control with gaze & expression recognition, semantic building data agents (Brick), and PV-GPT multi-agent pipelines.</li>
-    </ul>
-    <p><a class="btn" href="#publications">See selected publications</a> <a class="btn ghost" href="assets/Di_Zhang_Visual_CV_Academic.pdf">Download CV (PDF)</a></p>
-  </section>
-
-  <section id="news" class="section">
-    <h2>Recent news</h2>
-    <ul class="news">
-      <li><span class="tag purple">Career</span> I joined the HKUST collaboration on semantic AI for building energy systems. (Jul 2025)</li>
-      <li><span class="tag green">Publication</span> Our SCS paper on multi-objective green space design accepted. (Feb 2025)</li>
-      <li><span class="tag blue">Conference</span> Abstract accepted by CAADRIA 2026. (Jan 2025)</li>
-      <li><span class="tag gold">Award</span> HIT Special Grade Scholarship. (Dec 2023)</li>
-    </ul>
-  </section>
-
-  <section id="publications" class="section">
-    <h2>Selected publications</h2>
-    <ol class="pubs">
-      <li><strong>Adaptive façade control via gaze estimation & expression recognition.</strong> Building Simulation (Q1, IF 4.7), major revision.</li>
-      <li><strong>Prima-databot: LLM Agent for Brick-based time-series querying.</strong> Journal of Building Engineering (Q1, IF 7.6), under review.</li>
-      <li><strong>Multi-objective optimization for residential green space design.</strong> Sustainable Cities and Society (Q1, IF 10.3), accepted.</li>
-      <li><strong>PV-GPT: natural-language PV data querying.</strong> Manuscript in preparation.</li>
-      <li><strong>HAR for elderly care: literature review.</strong> CEB-ASC 2024, accepted (oral).</li>
-    </ol>
-  </section>
-
-  <section id="software" class="section">
-    <h2>Software & datasets</h2>
-    <ul class="bullets">
-      <li><strong>Prima-databot</strong> — Tool-augmented LLM agent for building data (Planner–Coder–Verifier). <em>Code release soon.</em></li>
-      <li><strong>PV-GPT</strong> — Multi-agent PV data pipeline, rule-based dataset generation and evaluation. <em>Preprint coming.</em></li>
-      <li><strong>Layout-Agent</strong> — LLM-based architectural layout generation with spatial reasoning. <em>Demo in progress.</em></li>
-    </ul>
-  </section>
-
-  <section id="cv" class="section">
-    <h2>CV</h2>
-    <p>One-page visual CV and portfolio PDFs:</p>
-    <ul class="bullets">
-      <li><a href="assets/Di_Zhang_Visual_CV_Academic.pdf" download>Academic CV (PDF)</a></li>
-      <li><a href="assets/Di_Zhang_Visual_CV_Portfolio.pdf" download>Portfolio (PDF)</a></li>
-    </ul>
-  </section>
-</main>
-
-<footer class="site-footer">
-  <div class="container">
-    <p>© 2025 Di Zhang · Powered by a minimal static template inspired by AcademicPages.</p>
-  </div>
-</footer>
 </body>
 </html>
