@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="ARCH7476 Assignment 03: seven-design thermal-zone capacity prototype, verified PMV calculations and uncertainty checks."><title>A3 · Thermal-zone capacity | ARCH7476</title><style>*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;color:#252a2d;background:white;font:16px/1.55 Arial,Helvetica,sans-serif}.topbar{background:#202529;color:white;padding:17px 30px;font-weight:600}.layout{max-width:1360px;margin:auto;padding:40px 30px;display:grid;grid-template-columns:minmax(0,1050px) 220px;gap:45px}main{min-width:0}header{padding-bottom:26px;border-bottom:1px solid #ccd2d5}h1{font-size:34px;line-height:1.16;margin:0 0 14px}header p{font-size:19px;color:#647078}.kicker{color:#277e8e;font-size:12px;letter-spacing:1.2px;font-weight:bold}section{padding:26px 0 30px;border-bottom:1px solid #d5dadd}h2{font-size:27px;line-height:1.25;margin:0 0 22px}h3{font-size:20px;line-height:1.3;margin:26px 0 10px}h4{font-size:16px;margin:23px 0 8px}p{margin:10px 0 16px}ul{padding-left:23px;margin:10px 0 18px}li{margin:7px 0}.decision{font-size:19px}blockquote{margin:18px 0;padding:4px 0 4px 20px;border-left:4px solid #a9b7bd;color:#3d494f}.table-wrap{overflow-x:auto;margin:18px 0 22px}table{width:100%;border-collapse:collapse;font-size:13px;line-height:1.4}th{text-align:left;border-top:1px solid #7d898f;border-bottom:2px solid #7d898f;padding:10px 9px}td{padding:10px 9px;vertical-align:top;border-bottom:1px solid #d8dfe2}tbody tr:nth-child(odd){background:#f3f5f6}td:first-child{font-weight:600}#evidence-map table,#tool-matrix table{min-width:940px;font-size:12px}.workflow{background:#f4f5f6;border:1px solid #dfe3e5;padding:24px;font:13px/1.5 Consolas,monospace;overflow:auto}aside{position:sticky;top:25px;align-self:start;font-size:13px;border-left:1px solid #d8dfe2;padding-left:17px}aside strong{display:block;margin-bottom:12px}aside a{display:block;margin:10px 0;text-decoration:none;color:#56636b}a{color:#277e8e;overflow-wrap:anywhere}.references{font-size:13px;padding-top:25px}.references h2{font-size:20px}.print{background:white;border:1px solid #9da8ae;padding:7px 12px;cursor:pointer;margin-top:14px}footer{margin-top:25px;color:#647078;font-size:12px}@page{size:A4 landscape;margin:13mm}@media print{body{font-size:11pt}.topbar,aside{display:none}.layout{display:block;padding:0}h1{font-size:25pt}h2{font-size:19pt}h3{font-size:14pt}h2,h3,h4{break-after:avoid}table{font-size:9pt!important;min-width:0!important}tr{break-inside:avoid}thead{display:table-header-group}.table-wrap{overflow:visible}.workflow{font-size:9pt}a{color:inherit;text-decoration:none}}@media(max-width:1000px){.layout{display:block;padding:25px 20px}aside{display:none}h1{font-size:29px}}.small-test-figure{margin:20px 0}.small-test-figure img{display:block;width:100%;height:auto;border:1px solid #d5dadd}.small-test-figure figcaption{margin-top:10px;color:#647078;font-size:13px}.small-test-link{font-size:14px;font-weight:600}@media(max-width:1000px){.small-test-figure figcaption{font-size:12px}}
 
 .hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0 0}.hero-actions a{border:1px solid #b9c8cd;padding:8px 12px;text-decoration:none;font-size:14px;font-weight:600}.hero-actions a:first-child{background:#277e8e;color:white;border-color:#277e8e}figure{margin:22px 0}figure img{display:block;width:100%;height:auto;border:1px solid #d5dadd}figcaption{color:#647078;font-size:13px;margin-top:8px}.report-table{overflow-x:auto;margin:18px 0 22px}.report-table table{min-width:680px}.report-table code{white-space:nowrap}pre{background:#f4f5f6;border:1px solid #dfe3e5;padding:18px;overflow:auto;font-size:13px}code{font-family:Consolas,monospace;font-size:.9em}section h2{margin-top:0}@media print{.hero-actions{display:none}figure{break-inside:avoid}}
-</style></head><body><div class="topbar">ARCH7476 · Evidence-Based Generative Design</div><div class="layout"><main><header><div class="kicker">A3 · WORKFLOW PROTOTYPE + VERIFICATION</div><h1>Thermal-zone capacity under changing user composition</h1><p>PeopleComfort v0.2.0 · A3 submission tag: a3-submission · 18 November 2026</p><div class="hero-actions"><a href="a3-assets/A3_research_report.pdf" download>Download report PDF ↓</a><a href="peoplecomfort.html">Explore the interactive tool ↗</a><a href="https://github.com/Hey-Guobaorou/peoplecomfort/tree/a3-submission">View frozen package ↗</a></div></header>
+</style></head><body><div class="topbar">ARCH7476 · Evidence-Based Generative Design</div><div class="layout"><main><header><div class="kicker">A3 · WORKFLOW PROTOTYPE + VERIFICATION</div><h1>Thermal-zone capacity under changing user composition</h1><p>PeopleComfort v0.2.0 · A3 submission tag: a3-submission · 18 November 2026</p><div class="hero-actions"><a href="a3-assets/A3_research_report.pdf" download>Download report PDF ↓</a><a id="ai-card" href="a3-ai-fact-checking-card.html">AI-Assisted Fact-Checking Card</a><a href="peoplecomfort.html">Explore the interactive tool ↗</a><a href="https://github.com/Hey-Guobaorou/peoplecomfort/tree/a3-submission">View frozen package ↗</a></div></header>
 
 <h2 id="summary">Four-line research summary</h2>
 <div class="report-table"><table>
@@ -422,92 +422,6 @@ python coursework/build_pdf.py
 <h3>6.3 Uncertainty and design action</h3>
 <p>The 81-condition grid combines common Ta/MRT offsets of -0.5/0/+0.5°C, opposing zone offsets of -0.5/0/+0.5°C, clothing offsets of -0.1/0/+0.1 clo and screening thresholds 0.4/0.5/0.6. These are equal-weighted grid points for diagnosis, not probabilities or calibrated instrument errors. D0 wins 26, D4 wins 23, D5 wins 17, D1 wins 11, D6 wins 3 and D3 wins 1 condition. D2 wins none. D4 has lower nominal holdout maximum regret than D0 by 33.3%, so the first exploratory gate passes. The second fails at 54/81 versus the required 61/81 or more. Relaxing the regret tolerance from 0.01 to 0.02 still yields 54/81; relaxing the coverage gate from 75% to 70% still requires 57/81. Neither single relaxation changes the action. <strong>Action: retain D0 as the constructed case comparison baseline, collect real plan, thermal and use evidence, then freeze and rerun the decision rule.</strong> This does not establish that D0 is comfortable or preferable in a real building.</p>
 <p>What remains untrusted: actual zone temperatures and radiant conditions, valid met/clo profiles for occupants, accessible/usable capacity, the behavioural plausibility of managed allocation, the omission of energy and construction cost, and the model's relation to observed thermal votes. A real A4 study should register the candidate set and gate, measure local conditions over relevant periods, map capacity and accessibility from a plan, observe occupancy and moves, record occupant votes, and compare predicted versus observed outcomes.</p>
-<h2 id="ai-card">7. AI-Assisted Fact-Checking Card</h2>
-<h3>Decision audit for the 6/6 claim</h3>
-<p>On 18 November 2026 the author requested a check of whether 6/6 remains robust, with the inputs, expected result, observed result and resulting revision recorded. This prompt summary comes from the current Codex chat. Codex (GPT-6.2 Astra, default collaboration mode) assisted with the calculation check and report wording. The original pilot model, settings and verbatim prompts are undocumented.</p>
-<div class="report-table"><table>
-<thead>
-<tr>
-<th>Audit item</th>
-<th>Record</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Decision and output type</td>
-<td>Capacity selection. The claim concerns a modelled relationship and depends on executable allocation code.</td>
-</tr>
-<tr>
-<td>Saved inputs and outputs</td>
-<td>The pilot input is examples/minimal/project.json. The expanded input is examples/extended-a3/project.json. The comparison is in coursework/extended_matrix.csv and the checked scores are in coursework/extended_results.json.</td>
-</tr>
-<tr>
-<td>Expected result and basis</td>
-<td>The robustness claim requires 6/6 to remain a minimax winner when all seven feasible splits compete on S0-S2. This is a retrospective test of the pilot claim. For the present rerun, verification/smoke_check.py already records the expected input hash, 91 cells and D4.</td>
-</tr>
-<tr>
-<td>Observed result</td>
-<td>The smoke check passed. Maximum development regret was 0.1139 for 6/6 and 0.1052 for 7/5. Their difference of 0.0086 places both within the exploratory 0.01 band.</td>
-</tr>
-<tr>
-<td>Judgment and consequence</td>
-<td>Reject the claim that 6/6 wins across the expanded candidate set. Report 7/5 as nominal winner and keep 6/6 as near-optimal. The action gate retains D0 as the constructed case comparison baseline.</td>
-</tr>
-<tr>
-<td>Reproducibility and follow-up</td>
-<td>The saved input and script reproduce the numerical check. Exact regeneration of the AI wording is uncertain. The current request is retained in the project chat. No original pilot transcript or dated peer feedback is documented here. Field use requires measured thermal conditions and observed seating.</td>
-</tr>
-</tbody>
-</table></div>
-<div class="report-table"><table>
-<thead>
-<tr>
-<th>AI-assisted claim or output</th>
-<th>Evidence and manual check</th>
-<th>Verdict</th>
-<th>Action</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>&quot;6/6 is the robust spatial design&quot;</td>
-<td>Original three-candidate analysis; seven-candidate rerun selects 7/5.</td>
-<td><strong>Reject</strong> as a general claim</td>
-<td>Replace with candidate-set-specific result; report D4 for the expanded set.</td>
-</tr>
-<tr>
-<td>&quot;Pinned CBE PMV is numerically integrated correctly&quot;</td>
-<td>Six pythermalcomfort cross-checks: max PMV difference 0.001497; 12 same-source deployment cases; inspect all six-factor inputs.</td>
-<td><strong>Accept</strong>, limited to numerical integration</td>
-<td>Preserve case ledger and version pins; do not infer field accuracy.</td>
-</tr>
-<tr>
-<td>&quot;D4 reduces regret relative to D0&quot;</td>
-<td>Inspect ten-holdout maximum regrets 0.1403 and 0.2105; recompute ratio from unrounded JSON.</td>
-<td><strong>Accept</strong> for the hypothetical model</td>
-<td>State 33.3% model improvement and its exact comparison.</td>
-</tr>
-<tr>
-<td>&quot;D4 should replace D0 in a real shared room&quot;</td>
-<td>No surveyed plan, measured thermal field, occupancy observations or pre-registered rule; stress gate fails.</td>
-<td><strong>Reject</strong></td>
-<td>Retain D0 as the constructed case comparison baseline pending site evidence and a prospective field decision.</td>
-</tr>
-<tr>
-<td>&quot;The 20% threshold was prespecified&quot;</td>
-<td>No timestamped or committed preregistration before the original holdout result.</td>
-<td><strong>Reject</strong></td>
-<td>Mark both the earlier threshold and revised action gate post hoc exploratory.</td>
-</tr>
-<tr>
-<td>&quot;The temperature contrast represents a typical reading room&quot;</td>
-<td>No source supports this exact simultaneous 23.5/27.5°C pair at this site.</td>
-<td><strong>Pending</strong></td>
-<td>Use measured or validated local inputs before claiming representativeness.</td>
-</tr>
-</tbody>
-</table></div>
-<p>AI assisted code, page and report drafting. The fact-checking verdicts were made against actual generated outputs and cited source records. The card is an audit of claims, not proof that the thermal model predicts any individual. <code>verification/independent_pmv_comparison.json</code>, the project JSON and <code>coursework/extended_results.json</code> preserve the checks.</p>
 <h2 id="a4">8. A4 extension</h2>
 <p>The next study should apply the workflow to one documented design decision with an actual plan. Survey or model zone conditions at relevant times, verify accessible and usable capacity, document occupancy mixes, and ask users for thermal votes. Freeze the design alternatives, outcome metrics and action gate before evaluating holdouts. Compare ideal assignment with observed choice and account for any management effort. Add buildability and resource cost if the number of places or HVAC conditions differ. Until these steps are complete, the prototype supports an inspectable <em>method</em>, not a site-specific redesign.</p>
 <h2 id="references">References</h2>
@@ -521,4 +435,4 @@ python coursework/build_pdf.py
 <li>pythermalcomfort maintainers (2026). <code>pmv_ppd_ashrae</code> model documentation, version 4.8.1. <a href="https://pythermalcomfort.readthedocs.io/en/stable/documentation/models.html">https://pythermalcomfort.readthedocs.io/en/stable/documentation/models.html</a></li>
 <li>Wang, H., Zhang, F., Li, J., Meng, H. and Lin, H. (2024). Effects of different zoning thermostat controls on thermal comfort and cooling energy consumption in reading rooms of a library. <em>Energy</em> 292, 130507. <a href="https://doi.org/10.1016/j.energy.2024.130507">https://doi.org/10.1016/j.energy.2024.130507</a></li>
 </ol>
-<footer>ARCH7476 · A3 · Thermal inputs are hypothetical until supported by site evidence.</footer></main><aside><strong>On this page</strong><a href="#summary">Four-line research summary</a><a href="#background">Research background and question</a><a href="#scope">1. Prototype Scope</a><a href="#hypothesis">1.1 Hypothesis and rival explanations</a><a href="#artifact">2. Workflow Artifact and reproducibility</a><a href="#workflow">3. Workflow Description</a><a href="#loop">4. Generative Loop and method rationale</a><a href="#output">5. Prototype Output and design interpretation</a><a href="#verification">6. Verification and Failure Log</a><a href="#ai-card">7. AI-Assisted Fact-Checking Card</a><a href="#a4">8. A4 extension</a><a href="#references">References</a><button class="print" onclick="window.print()">Print / Save PDF</button></aside></div></body></html>
+<footer>ARCH7476 · A3 · Thermal inputs are hypothetical until supported by site evidence.</footer></main><aside><strong>On this page</strong><a href="#summary">Four-line research summary</a><a href="#background">Research background and question</a><a href="#scope">1. Prototype Scope</a><a href="#hypothesis">1.1 Hypothesis and rival explanations</a><a href="#artifact">2. Workflow Artifact and reproducibility</a><a href="#workflow">3. Workflow Description</a><a href="#loop">4. Generative Loop and method rationale</a><a href="#output">5. Prototype Output and design interpretation</a><a href="#verification">6. Verification and Failure Log</a><a href="#a4">8. A4 extension</a><a href="#references">References</a><button class="print" onclick="window.print()">Print / Save PDF</button></aside></div><script>if(location.hash === '#ai-card') location.replace('a3-ai-fact-checking-card.html');</script></body></html>
