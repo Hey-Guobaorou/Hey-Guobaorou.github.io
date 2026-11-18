@@ -32,6 +32,7 @@ titles = [
     ("8. A4 extension", "a4"),
     ("References", "references"),
 ]
+body = body.replace("<h3>1.1 Hypothesis", '<h3 id="hypothesis">1.1 Hypothesis')
 for title, anchor in titles:
     body = body.replace(f"<h2>{html.escape(title)}</h2>", f'<h2 id="{anchor}">{html.escape(title)}</h2>', 1)
 body = re.sub(r"<p><img src=\"([^\"]+)\" alt=\"([^\"]+)\" ?/?></p>", lambda m: f'<figure><a href="{m.group(1)}" target="_blank" rel="noopener"><img src="{m.group(1)}" alt="{m.group(2)}" loading="lazy"></a><figcaption>{m.group(2)}</figcaption></figure>', body)
