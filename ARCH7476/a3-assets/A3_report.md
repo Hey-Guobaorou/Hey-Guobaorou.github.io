@@ -1,183 +1,178 @@
 # ARCH7476 · Assignment 03
-# Robust seating capacity under changing user composition
+# Thermal-zone capacity under changing user composition
 
-**PeopleComfort v0.1.0 | Research workflow prototype and verification | 18 November 2026**
+**PeopleComfort v0.2.0 | Revised workflow prototype | 18 November 2026**
 
-## Research background and problem
+## Four-line research summary
 
-Shared reading rooms, workplaces and other multi-user interiors often contain spatial differences in thermal conditions. People also differ in activity, clothing, preferences and ability to move. A design sized for one assumed user mix may perform poorly when that mix changes. The architectural decision examined here is the **distribution of useful seating capacity across contrasting thermal zones before the eventual mix of users is known**. The question is: *Which fixed seating configuration has the smallest opportunity loss across plausible user compositions, given identical total capacity and an implementable assignment rule?*
+| Item | Finding |
+|---|---|
+| Decision | Should a fixed 12-place shared room retain the existing 9/3 cooler/warmer capacity split (D0), or change the split before the future user mix is known? |
+| Core result | Across all seven feasible 12-place splits, minimax regret selects 7/5 (D4). Its maximum regret over the ten holdouts is 0.1403 versus D0's 0.2105: a 33.3% reduction in the model objective. The earlier three-candidate result that selected 6/6 (D1) does not survive candidate expansion. |
+| Greatest uncertainty | The thermal inputs and user mixes are hypothetical; 7/5 wins only 23 of 81 joint stress conditions, and ideal managed assignment has not been observed. |
+| Design action | Retain D0 pending site evidence. An explicitly exploratory action gate requires both at least 20% holdout improvement and non-inferiority to D0 in at least 75% of stress conditions; the second check reaches only 54/81 (66.7%). |
 
-This problem connects environmental design to space allocation. Research has documented individual thermal-preference patterns and their spatial context [1], optimized cubicle assignments for different personal comfort preferences [2], and coupled personal comfort models with space matching [3]. Seat-change recommendations have also been explored alongside air-conditioning control [4]. These studies establish that heterogeneous users and seating matter. The narrower gap examined here is an **auditable, pre-occupancy comparison of physical zone capacities under uncertain future composition**, with a frozen design decision, holdout compositions and joint input stress testing. This is a positioning claim for this prototype, not a systematic-review claim that no prior study has addressed it.
+## Research background and question
 
-The potential contribution is a method for asking where flexibility should be built into a shared plan, rather than merely optimizing a single day's assignments. Its value depends on environmental evidence, feasible user movement and an explicitly chosen fairness objective. The present artifact demonstrates the calculation chain with constructed data; it does not establish real occupant benefit.
+Shared interiors can contain different thermal regions while users differ in activity and clothing. A spatial design fixes how many people may use each region, whereas the eventual composition can change. Existing work studies spatial thermal preference [1], cubicle assignment under personal preferences [2], personal-comfort-model space matching [3], and seat recommendations coupled with HVAC control [4]. The narrower question here is whether a *physical capacity distribution*, selected before the user mix is known, remains useful across several mixes. The work compares a frozen design, not just one day's assignment.
 
-<!-- page -->
+**Research question.** Which two-zone capacity split minimizes the maximum opportunity loss across three development compositions, and how does that frozen split perform against the existing 9/3 split on holdout compositions, an alternate comfort metric and joint input perturbations?
+
+The method separates zone definition, thermal calculation, feasible allocation and decision comparison. The starting inputs are a transparent hypothetical stress case. There is no surveyed floor plan, measured thermal field or observed occupant sample. The PMV and PPD numbers are calculated with a formula from the stated six-factor inputs; they are not arbitrary pre-filled suitability ratings. A site-specific recommendation would require measured or credibly simulated zone conditions, capacity and use records.
 
 ## 1. Prototype Scope
 
-**Design decision.** Twelve functionally identical seats are distributed between two zones of one unchanged schematic plan. The cooler zone Z1 and warmer zone Z2 each have physical capacity for up to nine seats. D0, D1 and D2 are **design alternatives**, not user groups, temperatures or three different floor plans. Each has twelve seats, the same two environmental inputs and the same allocation algorithm. Their only controlled difference is how many seats are available in each zone.
+**Decision and controlled alternatives.** One schematic room has a cooler zone Z1 and warmer zone Z2, each with physical maximum capacity nine. Twelve equal capacity units are distributed between them. D0 is the stated existing reference, not historical evidence of an actual room. All seven feasible integer splits with Z1 capacity 3-9 are included. The physical intervention is capacity; the second-stage user placement is a common operating assumption.
 
-![Figure 1. Three alternative seat-capacity distributions in one fixed two-zone plan. Each small rectangle is one seat.](../results/figure_designs.png)
+![Figure 1. Seven feasible capacity distributions within the two-zone abstraction.](figure_extended_designs.png)
 
-| Design | Z1 cooler-zone seats | Z2 warmer-zone seats | Meaning |
-|---|---|---|---|
-| D0 | 9 | 3 | Illustrative existing configuration; most capacity is in the cooler zone |
-| D1 | 6 | 6 | Even distribution; preserves capacity in both environments |
-| D2 | 3 | 9 | Most capacity is in the warmer zone |
+| Design | Z1 / Z2 places | Role |
+|---|---:|---|
+| D0 | 9 / 3 | Existing reference within the analytical case |
+| D3 | 8 / 4 | Added candidate |
+| D4 | 7 / 5 | Added candidate; nominal robust winner |
+| D1 | 6 / 6 | Original balanced candidate |
+| D5 | 5 / 7 | Added candidate |
+| D6 | 4 / 8 | Added candidate; S0-only winner |
+| D2 | 3 / 9 | Original warmer-zone candidate |
 
-The image is a **capacity diagram**, not a measured floor plan: it does not assert seat coordinates, circulation widths, facade effects or actual room geometry. Seats are assumed equivalent in size, function and resource cost; a real study must verify these controls. Users are allocated only after a composition occurs, so the evaluation represents ideal managed matching rather than spontaneous seat choice.
+**Inputs and evidence status.** Z1 uses Ta=23.5°C, MRT=23.5°C, RH=50% and air speed=0.1 m/s. Z2 uses Ta=27.5°C, MRT=27.5°C, RH=50% and air speed=0.1 m/s. P1 is 1.0 met/0.5 clo, P2 is 1.2 met/0.5 clo, and P3 is 1.2 met/0.8 clo. These profiles describe activity and clothing, not age or demographic categories. The four-degree zone contrast deliberately stresses the decision. Related library research examines zone control and measured thermal conditions [8], but it does **not** validate these exact two values or their simultaneous occurrence in this room. Source labels in the JSON explicitly say that these inputs are hypothetical.
 
-**Workflow route and output target.** A Python package validates a project JSON, invokes pinned CBE thermal calculations through local Node.js, enumerates feasible assignments, ranks designs under three decision rules and exports full ledgers, CSV, SVG, HTML and JSON. The target is a rerunnable 3-design × 9-composition matrix, plus 81 joint input conditions.
+**Scenario range.** S0=8/2/2, S1=2/8/2 and S2=2/2/8 are development mixes, in P1/P2/P3 order. H0-H5 are the original six interior holdouts. H6=10/1/1, H7=0/0/12 and H8=12/0/0 probe mixes outside the development envelope. H9=4/2/2 has eight users and twelve available places, testing partial occupancy. All ten holdouts are excluded from design selection. The three extremes are deliberately constructed tests; they are not forecasts.
 
-**Out of scope.** Actual satisfaction, ageing physiology, behavioural prediction, transient adaptation, HVAC response, energy use, geometric feasibility and full standards compliance. Activity and clothing configurations P1–P3 are not demographic proxies. The environmental values and counts below are constructed examples, not site measurements or a visitor forecast.
+**Workflow route and output.** The rerunnable Python package calls pinned CBE thermal code, enumerates every feasible two-zone integer allocation, evaluates all 7×13=91 design-composition cells, computes three selection rules, and perturbs four thermal/screening assumptions jointly over 81 conditions. The browser page exposes the thermal inputs and recalculates PMV with the same pinned CBE JavaScript. Output includes full JSON, CSV, thermal ledger and three explanatory figures.
 
-<!-- page -->
+**Scope boundary.** No plan geometry, HVAC feedback, furniture feasibility, actual seat choice, temporal adaptation, energy cost or individual thermal vote is inferred. PMV is a group-average model evaluated for declared met/clo configurations; the profile labels do not turn it into an individual prediction.
 
-## 1.1 Inputs, sources and controlled comparisons
+## 1.1 Hypothesis and rival explanations
 
-| Input | Prototype value | Evidence status |
-|---|---|---|
-| Z1 environment | Ta=MRT=23.5°C; RH=50%; air speed=0.1m/s | Constructed cooler condition |
-| Z2 environment | Ta=MRT=27.5°C; RH=50%; air speed=0.1m/s | Constructed warmer condition |
-| P1 | Seated rest, 1.0 met, 0.5 clo | Exploratory activity/clothing configuration |
-| P2 | Seated task, 1.2 met, 0.5 clo | Exploratory activity/clothing configuration |
-| P3 | Seated task, 1.2 met, 0.8 clo | Exploratory warmer-clothing configuration |
-| Development compositions | S0=8/2/2; S1=2/8/2; S2=2/2/8, in P1/P2/P3 order | Constructed alternatives, each totaling 12 |
-| Holdout compositions | H0=6/3/3; H1=3/6/3; H2=3/3/6; H3=5/2/5; H4=2/5/5; H5=5/5/2 | Constructed transfer checks, excluded from selection |
-| PMV calculation | Pinned CBE comfort_tool implementation | Calculation reference, not field validation |
-
-The same zones, total seats, conditions, profiles, objective and matching rule apply to every design in the nominal comparison. Each design's allocation must obey zone capacity, profile access and full assignment of all twelve people. The user mix changes through explicit counts; no age, gender or other demographic label is converted into a thermal coefficient.
-
-**Calculation convention.** The adapter calls CBE `comf.pmvElevatedAirspeed` with self-generated air speed enabled and external work zero. The official function applies its dynamic-clothing and cooling-effect corrections once; the output records PMV, PPD, relative air speed, dynamic clothing and cooling effect. The original CBE JavaScript is pinned to commit `e809c965dd6eb2e785bf4851de2149c7a1d3c299` and bundled with its GPL-2.0 notices [5]. A PMV interval is used here as a project screening rule, not as proof of standards compliance or individual satisfaction.
-
-## 1.2 Research hypothesis and rival explanations
-
-**Primary, testable prototype hypothesis:** with the declared candidates and development compositions, minimizing maximum regret selects a different capacity distribution from minimizing only S0 loss, and the frozen robust choice has lower maximum regret across the six holdout compositions. A provisional comparison threshold is a 20% reduction. This criterion evaluates the constructed decision workflow; it is not a prespecified clinical or population effect.
-
-**Alternative explanations and threats:** the result may depend on the two chosen zone temperatures, the constructed composition envelope, symmetric PMV penalty, equal seats and ideal allocation. A balanced option may appear successful merely because the candidate set omits other layouts. The sensitivity grid and explicit holdout split probe some of these concerns, but observed behaviour and environmental feedback remain untested.
-
-<!-- page -->
+The original three-option pilot suggested 6/6 would be robust. Expanding the candidate set provides a direct challenge to that result. The revised hypothesis is narrower: a minimax-regret split can reduce maximum holdout opportunity loss relative to the existing 9/3 split under the declared model. Its rival explanations include candidate-set geometry, a threshold effect near P1's +0.530 PMV in Z2, extreme compositions, empty capacity at eight-person occupancy, and optimistic managed assignment. The tests below expose several of these dependencies rather than claiming a universal split.
 
 ## 2. Workflow Artifact and reproducibility
 
-The complete source package, project JSON, pinned CBE files, license, results and verification records are supplied. Python 3.11+ and Node.js 18+ are required; the computation itself has no third-party Python dependency. This build used Python 3.12.12 and Node v24.11.1. Run from the package root:
+The public repository contains the engine, pinned CBE JavaScript and GPL-2.0 notice, both project JSON files, analysis script, independent PMV-check script, outputs and tests. Python 3.11+ and Node.js 18+ are required for the main workflow; this run used Python 3.12.12 and Node v24.11.1. The independent library is a verification dependency only.
 
 ```console
-python run.py analyze --project examples/minimal/project.json --out rerun
+python -m pip install -e .
 python -m unittest discover -s tests -v
-python run.py serve
+python coursework/analyze_extended.py
+python run.py analyze --project examples/extended-a3/project.json --out rerun-extended
+python -m pip install -r verification/requirements.txt
+python verification/independent_pmv_check.py
+python coursework/build_pdf.py
 ```
 
-The first command rebuilds all numerical outputs and the SVG; the second checks the implementation; the third opens the browser workbench at http://127.0.0.1:8765. `pyproject.toml` also supports local installation. The report and PNG figures can be regenerated using `python coursework/build_report.py` with `requirements-report.txt`. Canonical input hash, engine source hash, source commit, runtime manifest, deterministic tie breaking and output hashes make differences inspectable. A screenshot is illustrative only; executable source and full inputs are the submitted artifact.
+`examples/extended-a3/project.json` drives the seven-design analysis and 81-condition stress grid. `examples/a3-thermal/project.json` expresses the same nominal decision in schema v2 for the public browser editor. `coursework/extended_matrix.csv`, `extended_results.json` and the figures can be regenerated. The independent verification compares the pinned CBE engine with pythermalcomfort 4.8.1. The PDF is generated from this Markdown source. A screenshot is supplementary to these runnable artifacts.
 
-| Submitted path | Inspectable purpose |
+**Isolated installation check.** A wheel was built, installed into a newly created Python virtual environment, and its `peoplecomfort analyze` command was run from outside the source checkout against `examples/a3-thermal/project.json`. It produced 91 rows and selected D4; the installed package contained the CBE source and browser assets. The temporary virtual environment is not part of the submission.
+
+| Artifact | Reproducibility role |
 |---|---|
-| src/peoplecomfort/, run.py, pyproject.toml | Calculation, enumeration, CLI, local interface |
-| examples/minimal/project.json | Zones, users, alternatives, scenario roles, stress ranges |
-| results/ | Input snapshot, row-level comparison, thermal and allocation ledgers, figures |
-| tests/, verification/ | 12 deployed CBE cases, 13 tests, installation and provenance records |
-| docs/, README.md | Setup, schema, operations, limitations |
-| coursework/ | This report and reproducible report builder |
+| `src/peoplecomfort/`, `run.py`, `pyproject.toml` | Validated engine, browser, CLI, pinned CBE implementation |
+| `examples/extended-a3/project.json` | All seven candidates, thirteen compositions, four stress dimensions and action-rule status |
+| `examples/a3-thermal/project.json` | Equivalent nominal inputs in the general schema used by the browser |
+| `coursework/analyze_extended.py`, `extended_results.json`, `extended_matrix.csv` | Rebuild and inspect the revised comparisons |
+| `verification/independent_pmv_check.py`, `independent_pmv_comparison.json` | Reproduce six-case cross-implementation PMV/PPD check |
+| `tests/` | Capacity, assignment, split, partial occupancy and PMV integration tests |
 
 ## 3. Workflow Description
 
 | Input | Operation | Output | Quality check | Design interpretation |
 |---|---|---|---|---|
-| Two zones, three profiles, three designs, nine compositions | Validate units, IDs, sources, counts and capacity | Accepted project or error | Reject missing, inconsistent and impossible inputs | Define a fair comparison boundary |
-| Six-factor thermal conditions | Evaluate pinned CBE function | Profile × zone PMV ledger | Compare 12 cases with deployed CBE values | Describe the modelled contrast |
-| Profile counts and seat limits | Exhaustively enumerate feasible integer assignments | Assignment and mean exceedance for each cell | Independent per-person oracle; manual small case | Best managed performance under each capacity |
-| Development losses | Apply T1/T2/T3 | Frozen selections | Preserve ties; prohibit holdout leakage | Compare decision rules |
-| Frozen alternatives and holdout | Compute regret | Holdout maximum gap | Do not reselect the primary decision | Test transfer to additional constructed mixes |
-| Joint stress ranges | Recalculate all affected quantities | Winner switching and regret ranges | Frequency is not probability | Expose conditionality of recommendation |
-
-<!-- page -->
+| Zone conditions, met/clo profiles and source statements | Validate six-factor bounds and calculate CBE PMV/PPD | Six profile-zone thermal records | Compare six nominal cases with independent pythermalcomfort; inspect input provenance | Identify modelled thermal opportunities, conditional on input quality |
+| Seven splits and 13 explicit mixes | Enumerate full feasible integer assignments; minimize mean PMV exceedance | 91 losses, assignments and group burdens | Conserve occupied people, enforce capacities/access, reject infeasible rows | Compare available capacity under identical thermal fields |
+| S0-S2 development rows | Minimize baseline loss, worst loss and maximum regret | Frozen candidate selections | Keep H0-H9 outside selection; preserve ties | Choose a physical split under uncertain composition |
+| H0-H9 | Compute regret for frozen designs; repeat using mean PPD | Holdout and alternate-metric checks | Show outside-envelope and eight-person rows separately | Test transfer and threshold dependence |
+| 81 joint input conditions | Recalculate PMV, allocation and selection | Winner counts and D0/D4 comparison | Treat counts as grid coverage, not probabilities | Decide whether a nominal recommendation survives perturbation |
 
 ## 4. Generative Loop and method rationale
 
-**Input condition:** one fixed two-zone schematic, twelve people and twelve seats, known candidate zone environments and explicit task/access constraints. **Variable/range:** three zone-capacity distributions, integer assignments of every profile to allowed zones, three development and six holdout compositions. **Variants:** D0=9/3, D1=6/6 and D2=3/9. **Evaluation metric:** person-weighted mean PMV exceedance, accompanied by flagged counts, worst-profile burden and assignments. **Output:** design-by-composition matrix, allocation ledger and regret. **Comparison rule:** T1 keeps D0; T2 minimizes loss for S0; T3 minimizes maximum regret across S0–S2. **Design action:** retain a conditional candidate for site-specific review only if constraints and the declared holdout comparison pass; otherwise report an unresolved or baseline decision.
+| Loop step | Declared implementation |
+|---|---|
+| 1. Input condition | One two-zone abstraction; twelve available places; CBE PMV inputs and access constraints |
+| 2. Variable / range | Z1 capacity 3-9, with Z2=12-Z1; 3 development mixes; 10 holdouts, one at 8/12 occupancy |
+| 3. Variants | D0, D3, D4, D1, D5, D6 and D2, covering all seven feasible splits |
+| 4. Evaluation metric | Mean exceedance `max(0, |PMV|-0.5)` per occupied person; report mean PPD in parallel |
+| 5. Output | Full 91-cell matrix, allocations, PMV/PPD ledger, regrets and 81-condition stress record |
+| 6. Comparison rule | S0-only minimum versus maximum development regret; compare selected design with D0 on frozen holdouts and stress grid |
+| 7. Design action | Apply the explicit exploratory gate below; if it fails, retain D0 pending field evidence |
 
-For profile *i* in zone *z*, define exceedance `e(i,z)=max(0, |PMV(i,z)| - tau)`, where nominal `tau=0.5`. Absolute PMV prevents cold and warm values from cancelling. The exceedance is a transparent model screening quantity, not an observed dissatisfaction rate or health outcome. For profile count `n(i)`, let `x(i)` occupy Z1 and `n(i)-x(i)` occupy Z2. Capacity and allowed-zone restrictions apply; all people remain counted. The design/composition loss `L(d,s)` is the sum of their exceedances divided by twelve. An infeasible allocation has no valid loss; it is never silently assigned zero.
+For type *i* in zone *z*, `e(i,z)=max(0,abs(PMV(i,z))-0.5)`. The design/scenario loss is `sum assigned_count(i,z)*e(i,z) / occupied_people`. Thus H9 is divided by eight, not twelve. Regret in scenario *s* is the design's loss minus the lowest feasible candidate loss in *s*. The algorithm enumerates all integer allocations to two zones, with capacity, full assignment and allowed-zone constraints. Equal first-stage capacity controls resource count; empty seats are permitted at partial occupancy. The model assumes a manager can implement the allocation. It does not predict voluntary movement.
 
-The small two-zone integer space permits complete enumeration, bounded by the product of `(n(i)+1)`. For each design and composition, the algorithm minimizes `L`, then uses the lowest worst-profile mean loss and a fixed lexicographic order to resolve allocation ties. Design-selection ties remain visible. This avoids heuristic optimum error within the declared model, though it does not make the model behaviourally realistic.
-
-Regret is `R(d,s)=L(d,s)-min_d' L(d',s)` over feasible candidates. T3 minimizes the largest `R` across development compositions. Minimax regret is appropriate here because composition probabilities are not known: it expresses the cost of choosing one fixed design if a different mix materializes. It depends on the candidate set, scenario range, PMV-based objective and ideal recourse. It should not be interpreted as a forecast of occupants' actual seating choices.
-
-**Decision scale.** The spatial intervention is the distribution of seats available in each environment. The second-stage allocation is a common operating assumption used to evaluate all designs. Keeping these levels distinct prevents an assignment improvement from being mistaken for a physical design improvement.
-
-<!-- page -->
+**Decision threshold status.** No auditable record proves that the pilot's 20% threshold was frozen before its first holdout calculation. It must therefore be treated as post hoc. The revised action gate (at least 20% holdout improvement versus D0, plus D4 no worse than D0 by more than 0.01 regret in at least 75% of the 81 stress conditions) is also explicitly exploratory and was formulated during this revision. It is a transparent decision rule for this exercise, not a preregistered confirmatory test. A field study must date and freeze its gate before collecting or inspecting holdout outcomes.
 
 ## 5. Prototype Output and design interpretation
 
-Under nominal constructed inputs, T1 retains D0, T2 chooses D2 and T3 chooses D1. The heat map displays all 27 design/composition comparisons. Decisions use unrounded values; printed values are rounded.
+The expanded candidate set changes the recommendation. S0-only selection is D6 (4/8); minimax development regret is D4 (7/5). The old 6/6 result was contingent on restricting the candidates to D0-D2. The full matrix includes three development, six interior holdout, three outside-envelope holdout and one eight-person holdout compositions.
 
-![Figure 2. Mean PMV exceedance by design and composition; S0–S2 select the design and H0–H5 are holdouts.](../results/figure_comparison.png)
+![Figure 2. PMV-exceedance loss for seven designs and thirteen compositions.](figure_extended_matrix.png)
 
-| Design | S0 loss | S1 loss | S2 loss | Dev. max regret | Holdout max regret |
-|---|---|---|---|---|---|
-| D0 | 0.1953 | 0.0234 | 0.0234 | 0.1570 | 0.1052 |
-| D1 | 0.0900 | 0.0785 | 0.1372 | 0.1139 | 0.0552 |
-| D2 | 0.0383 | 0.1337 | 0.2805 | 0.2571 | 0.1984 |
+| Design | S0 loss | Development max regret | Ten-holdout max regret | Stress-grid wins / 81 |
+|---|---:|---:|---:|---:|
+| D0 9/3 | 0.1953 | 0.1754 | 0.2105 | 26 |
+| D3 8/4 | 0.1602 | 0.1403 | 0.1754 | 1 |
+| D4 7/5 | 0.1251 | **0.1052** | **0.1403** | 23 |
+| D1 6/6 | 0.0900 | 0.1139 | 0.1432 | 11 |
+| D5 5/7 | 0.0549 | 0.1616 | 0.1910 | 17 |
+| D6 4/8 | **0.0199** | 0.2094 | 0.2387 | 3 |
+| D2 3/9 | 0.0383 | 0.2571 | 0.2864 | 0 |
 
-The S0-heavy P1 mix gives D2 the lowest baseline loss. Under S1 and S2, the value of Z1 capacity rises; D1 limits the worst opportunity loss across the development envelope. T2's holdout maximum regret is 0.1984 and T3's is 0.0552, a 72.19% reduction. The provisional 20% criterion is met **in this constructed case**. This percentage describes model regret relative to D2, not a measured increase in satisfaction, a predicted fraction of occupants helped or a population-level treatment effect.
+The headline comparison is D4 versus the existing D0: `(0.2105-0.1403)/0.2105 = 33.3%` lower maximum holdout regret. This is a reduction in *model opportunity loss*, not observed satisfaction. In the original restricted three-candidate pilot, D1 versus D0 reduced six-holdout maximum regret from 0.1052 to 0.0552 (about 47.5%). The former 72.19% headline compared D1 with the S0-only D2 and is not the relevant existing-design comparison. Candidate expansion changes all regret benchmarks, so the old and revised percentages must not be treated as the same experiment.
 
-The thermal ledger explains the mechanism. P1 has PMV approximately -0.951 in Z1 and +0.530 in Z2; P3 has +0.086 in Z1 and +1.073 in Z2. Therefore the same capacity distribution can have different losses as the profile counts change. P1's +0.530 is near the +0.5 screening boundary, making the exact ranking sensitive to inputs and threshold. D1 is a conditional compromise within these three alternatives, not a universal 6/6 prescription. Type-level results should be reviewed because a lower aggregate regret need not help every profile in every scenario.
+The extreme holdouts reveal asymmetry. H6=10/1/1 gives D0 loss 0.2704 and D1 loss 0.1651; H7=0/0/12 gives D0 0.1432 and D1 0.2864; H8=12/0/0 gives D0 0.3455 and D1 0.2403. H9=4/2/2 uses eight people and twelve available places, giving D0 0.0675 and D1 0.0149. This is a structural test of spare capacity, not evidence of actual occupancy probabilities.
 
-<!-- page -->
+**Alternate continuous check.** Re-optimizing allocation on *mean CBE PPD* selects D4 on both development and extended holdout maximum-regret criteria. Development PPD-regret is 3.3051 percentage points for D4 versus 5.5084 for D0; holdout PPD-regret is 4.4067 versus 6.6101. This agreement reduces concern that the nominal ranking is solely an artifact of the ±0.5 PMV screening edge, but PPD is derived from the same PMV model and is not independent occupant feedback.
+
+![Figure 3. Development winner counts over 81 conditions and the extended holdout comparison with D0.](figure_extended_decision.png)
 
 ## 6. Verification and Failure Log
 
-### 6.1 What was verified
+### 6.1 What worked and what was checked
 
-| Level | Check | Result and scope |
+The six nominal CBE outputs were independently recomputed with pythermalcomfort 4.8.1 `pmv_ppd_ashrae`, using its relative-air-speed helper, zero external work and unrounded output [7]. Across the six cases, maximum absolute PMV difference was 0.001497 and maximum PPD difference was 0.0458 percentage points. This checks an independently maintained implementation of the same model, not field accuracy. Twelve additional comparisons with the public CBE deployment remain integration checks because the source ancestry is shared. The assignment solver is separately checked against a person-level brute-force oracle; automated tests cover invalid inputs, holdout separation and partial occupancy. The browser's default thermal ledger and nominal winner were compared with Python results.
+
+### 6.2 Substantive failure and revision record
+
+| Observation or failure | Check performed | Revision and consequence |
 |---|---|---|
-| CBE adapter | 12 input sets captured from the public deployment's function; maximum PMV difference 3.11e-14 and PPD difference 1.38e-12 | Numerical adapter agreement for tested conditions |
-| Allocation | Independent individual-assignment oracle; manual three-person case with minimum total burden 0.5 and mean 0.5/3 | Optimum, denominator and flagged count checked |
-| Boundary logic | Invalid totals, capacities, missing source, inaccessible users, equal environments and ties | Rejected or represented explicitly |
-| Scenario separation | Change holdout counts and rerun | Development selection unchanged |
-| Reproducibility | Repeat computation, wheel installation outside source tree and CLI execution | Same result bytes and recorded output hashes |
-| Interface | Edit, invalid-count error, correction, import, export and guide navigation | Browser workflow completed in English |
+| The original 6/6 D1 choice looked robust among only three symmetric alternatives. | Enumerated every feasible 12-place split from 3/9 through 9/3. | D4 7/5 becomes the minimax-regret winner. The earlier D1 headline is withdrawn as a candidate-set-dependent finding. |
+| The earlier six holdouts lay inside the development envelope. | Added 10/1/1, 0/0/12 and 12/0/0 outside-envelope compositions, plus 4/2/2 at eight-person occupancy. | Maximum holdout regret increases; extreme mixes sometimes favour opposite capacity directions. Transfer remains a finite constructed test. |
+| Full occupancy forced all twelve places into use. | Enabled explicitly declared partial occupancy and checked an eight-person allocation ledger. | Empty capacity changes loss; the denominator is occupied people. The original schema still rejects partial occupancy without opt-in. |
+| PMV exceedance may be sensitive to P1's Z2 PMV near +0.5. | Recomputed assignments and regret using continuous PPD. | D4 remains nominal winner under PPD, but PPD shares the PMV model and cannot validate lived experience. |
+| A nominal D4 win might invite an unconditional redesign claim. | Recomputed selection across 81 joint temperature, clothing and threshold conditions. | D4 wins 23/81; D0 wins 26/81. D4 is within 0.01 regret of D0 in only 54/81 (66.7%), below the exploratory 75% action gate. Retain D0 pending site evidence. |
+| Shared CBE code produced near-exact agreement with its own deployment. | Added pythermalcomfort as a separate implementation and recorded six-case signed differences. | Numerical confidence is stronger but empirical validity is still untested. |
+| The starting temperatures had no site provenance. | Audited source fields and reviewed library thermal-zoning literature. | Values are now explicitly labelled a hypothetical contrast, not a representative measured room; no field-design claim follows. |
 
-There are 13 automated tests; the complete log is in `verification/test_log.txt`. CBE deployed and bundled code share ancestry. Their numerical agreement checks integration, not independent physical validity. The small manual case and separate enumeration oracle check assignment logic independently. Actual thermal conditions, user votes, preferred seating, furniture effects and room geometry have **not** been measured. No empirical comfort or ageing claim follows from these checks.
+### 6.3 Uncertainty and design action
 
-### 6.2 Failure and revision record
+The 81-condition grid combines common Ta/MRT offsets of -0.5/0/+0.5°C, opposing zone offsets of -0.5/0/+0.5°C, clothing offsets of -0.1/0/+0.1 clo and screening thresholds 0.4/0.5/0.6. These are equal-weighted grid points for diagnosis, not probabilities or calibrated instrument errors. D0 wins 26, D4 wins 23, D5 wins 17, D1 wins 11, D6 wins 3 and D3 wins 1 condition. D2 wins none. D4 has lower nominal holdout maximum regret than D0 by 33.3%, so the first exploratory gate passes. The second fails at 54/81 versus the required 61/81 or more. **Action: retain D0 as the provisional reference, collect real plan, thermal and use evidence, then freeze and rerun the decision rule.** This does not establish that D0 is comfortable or preferable in a real building.
 
-| Event | Observation | Consequence |
-|---|---|---|
-| Source retrieval and script path | Initial restricted network and an incorrect guessed script path required source provenance review | Official pinned source and license were bundled; runtime is offline |
-| Example path and local preview | An initial copy path and preview access failed | Corrected before packaging; rerun and browser checks passed |
-| Infeasible assignment | Deliberate inaccessible/capacity examples have no full allocation | Report infeasible, never zero burden |
-| Recommendation stability | Nominal D1 wins only 39 of 81 stress conditions | A universal-winner interpretation fails |
-| Empirical validity | No measured room or occupant dataset | Field effectiveness remains unverified |
+What remains untrusted: actual zone temperatures and radiant conditions, valid met/clo profiles for occupants, accessible/usable capacity, the behavioural plausibility of managed allocation, the omission of energy and construction cost, and the model's relation to observed thermal votes. A real A4 study should register the candidate set and gate, measure local conditions over relevant periods, map capacity and accessibility from a plan, observe occupancy and moves, record occupant votes, and compare predicted versus observed outcomes.
 
-The assumptions with greatest decision impact are that the environmental field remains fixed when furniture or occupancy changes, and that an operator can implement the optimal user allocation. Neither is established by CBE numerical agreement.
+## 7. AI-Assisted Fact-Checking Card
 
-<!-- page -->
+| AI-assisted claim or output | Evidence and manual check | Verdict | Action |
+|---|---|---|---|
+| "6/6 is the robust spatial design" | Original three-candidate analysis; seven-candidate rerun selects 7/5. | **Reject** as a general claim | Replace with candidate-set-specific result; report D4 for the expanded set. |
+| "Pinned CBE PMV is numerically integrated correctly" | Six pythermalcomfort cross-checks: max PMV difference 0.001497; 12 same-source deployment cases; inspect all six-factor inputs. | **Accept**, limited to numerical integration | Preserve case ledger and version pins; do not infer field accuracy. |
+| "D4 reduces regret relative to D0" | Inspect ten-holdout maximum regrets 0.1403 and 0.2105; recompute ratio from unrounded JSON. | **Accept** for the hypothetical model | State 33.3% model improvement and its exact comparison. |
+| "D4 should replace D0 in a real shared room" | No surveyed plan, measured thermal field, occupancy observations or pre-registered rule; stress gate fails. | **Reject** | Retain D0 pending site evidence and a prospective field decision. |
+| "The 20% threshold was prespecified" | No timestamped or committed preregistration before the original holdout result. | **Reject** | Mark both the earlier threshold and revised action gate post hoc exploratory. |
+| "The temperature contrast represents a typical reading room" | No source supports this exact simultaneous 23.5/27.5°C pair at this site. | **Pending** | Use measured or validated local inputs before claiming representativeness. |
 
-## 6.3 Joint uncertainty and limits of inference
+AI assisted code, page and report drafting. The fact-checking verdicts were made against actual generated outputs and cited source records. The card is an audit of claims, not proof that the thermal model predicts any individual. `verification/independent_pmv_comparison.json`, the project JSON and `coursework/extended_results.json` preserve the checks.
 
-The stress grid combines three common Ta/MRT offsets (-0.5, 0, +0.5°C), three opposing zone shifts (-0.5, 0, +0.5°C), three common clothing offsets (-0.1, 0, +0.1 clo) and three screening thresholds (0.4, 0.5, 0.6 PMV). It contains 81 joint conditions. Air and mean radiant temperatures shift together as declared; the grid is a transparent perturbation design, not a calibrated instrument-error model or confidence interval.
+## 8. A4 extension
 
-![Figure 3. Development winner counts and frozen-design holdout maximum-regret ranges under the joint input grid.](../results/figure_uncertainty.png)
-
-World-specific development winners occur D0=33, D1=39 and D2=9 times. Fixed-design holdout maximum-regret ranges are D0=0.0000–0.4275, D1=0.0000–0.1844 and D2=0.0268–0.4350. These are counts of chosen grid points, **not probabilities**. The nominal T3 decision remains frozen when testing the grid; recomputing world-specific winners diagnoses sensitivity and does not retroactively choose the design.
-
-Holdout compositions were constructed by the researcher and use the same thermal engine; they test finite scenario transfer rather than independent participants or buildings. Unquantified uncertainties include within-profile variation, actual thermal preference, mobility and seat choice, occupancy effects on the environment, other possible layouts, equal weights among users and the symmetry of hot/cold penalties. Some individuals may be worse off under an aggregate-best design. A future study should predefine fairness and access constraints and test practical allocation before claiming occupant benefit.
-
-## 6.4 A4 extension and broader significance
-
-Apply the workflow to a documented past or current design decision. Measure or justify spatial conditions, map real usable capacities and access restrictions, observe how people choose seats, and record thermal votes. Freeze candidates and ranges before evaluation; compare model allocations with observed behaviour, then revise assumptions where they fail. Possible extensions include time-varying occupancy, more than two zones, local comfort models, accessibility, daylight and noise, energy and adaptation costs. The broader research question becomes how a shared interior can retain useful options for different users as its population changes, and which flexibility is worth designing into the physical plan.
-
-## 6.5 AI-assisted verification disclosure
-
-AI assisted code, test, interface and report drafting. `verification/AI_LOG.md` records the work and checks; it is a summary rather than a verbatim prompt transcript. All input environments and user counts are marked as constructed. No field measurement, participant evidence or independent physiological validation was generated by AI.
-
-<!-- page -->
+The next study should apply the workflow to one documented design decision with an actual plan. Survey or model zone conditions at relevant times, verify accessible and usable capacity, document occupancy mixes, and ask users for thermal votes. Freeze the design alternatives, outcome metrics and action gate before evaluating holdouts. Compare ideal assignment with observed choice and account for any management effort. Add buildability and resource cost if the number of places or HVAC conditions differ. Until these steps are complete, the prototype supports an inspectable *method*, not a site-specific redesign.
 
 ## References
 
-1. Shahzad, S. et al. (2019). Patterns of thermal preference and Visual Thermal Landscaping model in the workplace. *Applied Energy*. https://doi.org/10.1016/j.apenergy.2019.113674
-2. Optimal Open Space Cubicle Assignment Considering Personal Thermal Comfort Differences. https://experts.mcmaster.ca/scholarly-works/2147169
-3. Space-matching strategies based on personal comfort models to optimize collective comfort probability. *Building and Environment* (2025). https://www.sciencedirect.com/science/article/pii/S0360132325003014
-4. Human-centric Air Conditioning System with Seat Changes. IBPSA ASIM (2024). https://publications.ibpsa.org/conference/paper/?id=asim2024_1308
-5. Center for the Built Environment. PMV model documentation and comfort_tool source. https://cbe-berkeley.gitbook.io/thermal-comfort-tool/documentation/pmv ; https://github.com/CenterForTheBuiltEnvironment/comfort_tool
+1. Shahzad, S., Calautit, J.K., Hughes, B.R., et al. (2019). Patterns of thermal preference and Visual Thermal Landscaping model in the workplace. *Applied Energy* 255, 113674. https://doi.org/10.1016/j.apenergy.2019.113674
+2. Lei, S. and Shen, W. (2021). Optimal Open Space Cubicle Assignment Considering Personal Thermal Preferences. *2021 IEEE CSCWD*, 913-918. https://doi.org/10.1109/CSCWD49262.2021.9437617
+3. Huang, W., Xu, Q., Zhao, B., Lv, Q. and Wang, G. (2025). Space-matching strategies based on personal comfort models to optimize collective comfort probability. *Building and Environment*, 112819. https://doi.org/10.1016/j.buildenv.2025.112819
+4. Kamiya, Y., Zhang, R., Kanayama, H., Sato, D., Matsui, N., Taniguchi, K. and Akashi, Y. (2024). Human-centric Air Conditioning System with Seat Changes: Control Logic Combining Seat Change Recommendations and Air Conditioning Control. *ASim 2024*, 316-323. https://doi.org/10.69357/asim2024.1308
+5. Center for the Built Environment, University of California, Berkeley. PMV Model documentation and pinned `comfort_tool` source. https://cbe-berkeley.gitbook.io/thermal-comfort-tool/documentation/pmv ; https://github.com/CenterForTheBuiltEnvironment/comfort_tool
 6. ARCH7476. Assignment 03 and Assignment 04. https://caadfutures2025.hku.hk/ARCH7476/assignments/assignment-03.html ; https://caadfutures2025.hku.hk/ARCH7476/assignments/assignment-04.html
+7. pythermalcomfort maintainers (2026). `pmv_ppd_ashrae` model documentation, version 4.8.1. https://pythermalcomfort.readthedocs.io/en/stable/documentation/models.html
+8. Wang, H., Zhang, F., Li, J., Meng, H. and Lin, H. (2024). Effects of different zoning thermostat controls on thermal comfort and cooling energy consumption in reading rooms of a library. *Energy* 292, 130507. https://doi.org/10.1016/j.energy.2024.130507
