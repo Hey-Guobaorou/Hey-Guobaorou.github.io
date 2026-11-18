@@ -1,8 +1,10 @@
 from pathlib import Path
-import sys,json,csv,itertools,shutil
+import sys,json,csv,itertools,shutil,os
 import matplotlib.pyplot as plt
 p=Path(__file__).resolve().parent
-r=p.parent/'peoplecomfort/release/PeopleComfort_Pages_update'
+r=Path(os.environ['PEOPLECOMFORT_REPO']) if 'PEOPLECOMFORT_REPO' in os.environ else p.parent/'peoplecomfort/release/PeopleComfort_Pages_update'
+if not (r/'examples/extended-a3/project.json').is_file():
+ raise SystemExit('Set PEOPLECOMFORT_REPO to the cloned PeopleComfort repository root')
 sys.path.insert(0,str(r/'src'))
 from peoplecomfort.core import analyze
 j=json.loads((r/'examples/extended-a3/project.json').read_text())

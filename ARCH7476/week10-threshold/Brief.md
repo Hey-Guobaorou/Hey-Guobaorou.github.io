@@ -1,55 +1,138 @@
-# PeopleComfort | Threshold studio handoff
+# PeopleComfort A3 | Full peer reproduction brief
 
-[Open the peer flipbook](https://hey-guobaorou.github.io/ARCH7476/week10-threshold/flipbook.html) · [Check the design totals](options.csv) · [Download the full threshold grid](epsilon.csv)
+## Purpose and experimental design
 
-**Peer check.** Keep minimum gain at 20% and tolerance at 0.01. Change minimum coverage from 75% to exactly two thirds (displayed as 66.7%). Record the feasible designs, Pareto set and decision at both settings. Check D4 against its count of 54 in options.csv and the corresponding rows in epsilon.csv.
+A planner must place twelve seats across a cooler zone Z1 and warmer zone Z2 before knowing who will arrive. The reference D0 has 9/3 seats. D0-D6 cover all seven feasible integer splits with at most nine seats per zone. The hypothetical reading room has Z1 air and radiant temperatures of 23.5 °C and Z2 values of 27.5 °C. Both zones have 50% humidity and 0.1 m/s air speed. P1 is 1.0 met/0.5 clo, P2 is 1.2 met/0.5 clo, and P3 is 1.2 met/0.8 clo. All can enter both zones. The program finds the lowest-loss feasible assignment after the user mix is known.
 
-## The design decision
+S0=8/2/2, S1=2/8/2 and S2=2/2/8 are development mixes in P1/P2/P3 order. They select the layout. H0-H9 are ten additional constructed mixes for examining that frozen selection. H9 has only eight occupants. For each person, exceedance is `max(0, abs(PMV) - 0.5)`. A design's loss is mean exceedance across occupants. For any one mix, regret is that design's loss minus the lowest loss among all seven designs in the same mix. In S0, D0 loss 0.1953 minus D6 loss 0.0199 gives D0 regret 0.1754. D4 (7/5) minimizes the largest regret across S0-S2 at 0.1052, compared with D1 at 0.1139.
 
-A reading-room planner must place twelve identical seats before knowing who will arrive. The reference layout D0 puts nine seats in the cooler zone Z1 and three in the warmer zone Z2. The proposed change D4 moves two seats into Z2, giving 7/5. Each zone can hold at most nine seats, so seven integer splits are possible. The question for the planner is whether the expected benefit of changing the layout holds up when the room, clothing or screening assumptions change.
+Freeze D4, then compare H0-H9 maximum regrets. D0 scores 0.2104749 and D4 0.1403166. Their relative reduction is 33.3333%, exceeding the exploratory 20% minimum. The 81-condition grid combines three values of each of four factors. Common air and radiant temperature offset `t` is −0.5/0/+0.5 °C in both zones. Opposing offset `g` is −0.5/0/+0.5 °C, subtracted in Z1 and added in Z2. Clothing offset `c` is −0.1/0/+0.1 clo for all profiles. The PMV screening boundary is 0.4/0.5/0.6. S, H and D counts remain fixed. PMV, allocation, loss and regret are recalculated in every condition.
 
-The broader research topic is spatial planning under changing user composition, including population ageing. This prototype represents people through activity and clothing. Applying it to older readers would require local observations of activities, clothing, access needs and seat choice. The room and all user mixes here are constructed.
+One condition passes if fixed D4's maximum H0-H9 regret is at most fixed D0's maximum plus 0.01. At least 75% of 81 conditions, or 61, must pass. Only 54 pass. The action in this constructed case is to retain 9/3 pending site evidence. The 20%, 0.01 and 75% are exploratory project judgments, and 54/81 is grid coverage rather than a real-world probability.
 
-## What the model assumes
+## Software and source version
 
-| Input | Nominal case | Why it matters |
-|---|---|---|
-| Thermal zones | Air temperature and mean radiant temperature are both 23.5 °C in Z1 and 27.5 °C in Z2. Relative humidity is 50% and air speed 0.1 m/s in both zones. | Two seats in different zones can produce different thermal exposure for the same reader. |
-| Reader profiles | P1: 1.0 met / 0.5 clo. P2: 1.2 met / 0.5 clo. P3: 1.2 met / 0.8 clo. Met measures activity and clo measures clothing insulation. | P1 and P2 isolate an activity difference; P2 and P3 isolate a clothing difference. |
-| Access and operation | All three profiles can use both zones. Once users arrive, the solver finds the feasible assignment with the lowest mean loss. Capacity and environment stay fixed during assignment. | Scores describe what managed seating can achieve. Actual seat choice requires observation. |
-| User mixes | Develop on S0 = 8/2/2, S1 = 2/8/2 and S2 = 2/2/8, in P1/P2/P3 order. Evaluate the chosen split on ten additional mixes H0–H9. Six fall within the development envelope, three extend beyond it, and one has eight occupants. | Selection and evaluation have distinct roles. The ten holdouts are constructed stress cases. |
+Use Windows PowerShell, Git, Python 3.11+ and Node.js 18+. The original run used Python 3.12.12 and Node v24.11.1. The A3 input and calculation were frozen at commit `e097a70664d19c0fbf78a2655350e94f48dc8126` (`a3-submission`). The revised report source is at commit `20f6d1c24a586200f8b2c129035a60992ac0f43c`. Both have the same A3 input. Use the revised commit below for report reproduction. CBE source is bundled at commit `e809c965dd6eb2e785bf4851de2149c7a1d3c299`.
 
-## How to read loss and regret
+### 1. Check your tools
 
-PMV estimates average thermal sensation for a stated environment, activity and clothing level. Zero is neutral. At the nominal screening limit of 0.5, each occupied seat contributes max(0, abs(PMV) − 0.5). For example P1 has PMV −0.951 in Z1 and +0.530 in Z2. Moving that reader reduces the exceedance from 0.451 to 0.030, although both seats still flag the reader. A layout's **loss** is the mean exceedance across the people present after allocation.
+```powershell
+Get-Command git, python, node | Select-Object Name, Source
+git --version
+python --version
+node --version
+```
 
-**Regret** measures the extra loss incurred by choosing a particular layout when another layout would have served the same mix better. Subtract the lowest loss among all seven layouts for that mix from the chosen layout's loss. In S0 the reference D0 scores 0.1953 and the best layout D6 scores 0.0199. D0 therefore has regret 0.1754. D6 has zero regret in S0 even though its loss is positive.
+If any command fails, install that tool before proceeding. Use the same Python executable for every later step.
 
-For each layout take its largest regret across S0–S2. The layout with the smallest such maximum is D4 (7/5). Freeze that choice. Across H0–H9 its maximum regret is 0.1403 against 0.2105 for D0, a 33.3% reduction using full precision. The comparison concerns the magnitude of modelled exposure; for the same allocations, flagged headcount is unchanged in six holdouts and increases in four.
+### 2. Clone and create a clean Python environment
 
-## How the 81 test conditions are built
+```powershell
+$reviewRoot = Join-Path $env:USERPROFILE 'Documents\PeopleComfort_A3_peer_review'
+New-Item -ItemType Directory -Force -Path $reviewRoot | Out-Null
+Set-Location $reviewRoot
+git clone https://github.com/Hey-Guobaorou/peoplecomfort.git
+Set-Location (Join-Path $reviewRoot 'peoplecomfort')
+git checkout 20f6d1c24a586200f8b2c129035a60992ac0f43c
+git rev-parse HEAD
+git rev-parse 'a3-submission^{commit}'
+python -m venv .venv
+$python = Join-Path (Get-Location) '.venv\Scripts\python.exe'
+& $python -m pip install --upgrade pip
+& $python -m pip install -e .
+& $python -m pip install numpy matplotlib reportlab pillow
+```
 
-A **user mix** specifies who arrives. A **grid condition** specifies the environment, clothing adjustment and scoring boundary under which every layout and user mix is recalculated. The grid takes every combination of the following levels once. Each factor has a central value plus a lower and higher value to explore sensitivity around the nominal case. The ranges are exploratory project choices; no frequency distribution or instrument calibration was used.
+The two `git rev-parse` commands should print the revised and frozen commits listed above. The package has no third-party Python dependency for its core calculation. Plotting and PDF generation require the packages installed in the last line. Node runs the bundled CBE thermal calculator.
 
-| Factor | Three levels | Exact operation in one condition |
-|---|---|---|
-| Common temperature shift, t | −0.5, 0, +0.5 °C | Add t to both zones' air and radiant temperatures. Tests a cooler or warmer room overall. |
-| Opposing zone shift, g | −0.5, 0, +0.5 °C | Subtract g in Z1 and add g in Z2. The warm-minus-cool contrast becomes 3, 4 or 5 °C respectively. |
-| Common clothing shift, c | −0.1, 0, +0.1 clo | Add c to all three profiles' clothing values. Activity, humidity and air speed stay fixed. |
-| PMV screening limit, tau | 0.4, 0.5, 0.6 | Apply max(0, abs(PMV) − tau). This changes how exposure is scored. |
+### 3. Rerun the A3 analysis
 
-For example, choose t = +0.5, g = +0.5, c = −0.1 and tau = 0.6. Z1 becomes 23.5 + 0.5 − 0.5 = 23.5 °C and Z2 becomes 27.5 + 0.5 + 0.5 = 28.5 °C. Clothing becomes 0.4, 0.4 and 0.7 clo. Compute PMV with those inputs, apply the 0.6 limit and solve the allocations again. Crossing the three levels of all four factors gives 3 × 3 × 3 × 3 = **81 conditions**, including the nominal condition.
+Run these from the `peoplecomfort` repository root:
 
-## What one pass means, and why the line is at 61
+```powershell
+& $python verification/smoke_check.py
+& $python -m unittest discover -s tests -v
+& $python coursework/analyze_extended.py
+& $python run.py analyze --project examples/extended-a3/project.json --out rerun-extended
+```
 
-1. Within one grid condition, calculate the seven layout losses in each holdout mix. Recompute the best loss separately in each mix under that same condition.
-2. Subtract each mix's best loss to get regret. For each frozen layout, take its maximum regret across the ten holdouts. The worst mix may differ between layouts.
-3. Count one pass if D4's maximum is at most D0's maximum **plus 0.01**. Here 0.01 is an absolute tolerance in regret units. Equality passes. A pass can include a small disadvantage for D4.
-4. The action rule requires both a **20% reduction** under nominal inputs and passes in **at least 75%** of the grid. The first test compares 33.3% with 20%. The second requires the smallest whole count reaching 75% of 81: **61**. The observed count is **54**, seven short. The recommended action in this constructed case is to keep 9/3 pending site evidence.
+The smoke check must print `PASS`, input hash `bc361fcd1a90f8c77f7e780289ab56f989b883e550ba6968464d771aa18f5210`, `cells=91`, and `winner=D4`. Tests end with `OK`. The analysis writes `coursework/extended_results.json`, `extended_matrix.csv`, and three `figure_extended_*.png` figures. The CLI writes the full output and run manifest to `rerun-extended`. The 91 nominal comparison rows equal seven designs times 13 mixes.
 
-These three settings have separate meanings: tau defines individual exposure, 0.01 defines an acceptable layout disadvantage, and 75% defines the required coverage. Grid coverage describes sensitivity to the selected levels. It does not estimate the chance of success in an actual building.
+### 4. Independently inspect the numbers in PowerShell
 
-Bring A3_matrix.csv as the nominal design-by-mix output. The two drawing briefs below use the same setup.
+```powershell
+$summary = Get-Content coursework/extended_results.json -Raw | ConvertFrom-Json
+$matrix = Import-Csv coursework/extended_matrix.csv
+$summary.development_winner
+$summary.baseline_winner
+$summary.development_max_regret.D4
+$summary.holdout_max_regret.D0
+$summary.holdout_max_regret.D4
+$summary.relative_improvement_vs_existing
+$summary.stress_noninferiority_count
+$summary.stress_total
+$summary.action_rule_passed
+$matrix.Count
+$matrix | Where-Object { $_.scenario -eq 'S0' -and $_.design -in @('D0','D6') } | Format-Table scenario,design,loss,regret
+```
+
+Expect D4, D6, 0.1052374, 0.2104749, 0.1403166, 0.3333333, 54, 81, False, and 91 in that order. The S0 rows support the manual subtraction 0.1953 − 0.0199 = 0.1754. Use unrounded values in the JSON for percentages.
+
+```powershell
+$project = Get-Content examples/extended-a3/project.json -Raw | ConvertFrom-Json
+$project.uncertainty | Format-List
+$project.design_action_rule | Format-List
+[math]::Ceiling($summary.stress_total * $project.design_action_rule.stress_noninferiority_fraction)
+$summary.stress_noninferiority_count / $summary.stress_total
+```
+
+The last two lines should return 61 and approximately 0.6667. Inspect the four lists under `uncertainty` and three action thresholds in `design_action_rule`. For a complete row-level audit of all 81 conditions, use the programmatic `analyze(project, True)` result. Each `uncertainty` record gives the four offsets, world-specific development winners and `holdout_regret_by_design` for all seven layouts. The 81 values are recalculated, not averaged into one regret.
+
+### 5. Check an independent PMV implementation and rebuild the PDF
+
+```powershell
+& $python -m pip install -r verification/requirements.txt
+& $python verification/independent_pmv_check.py
+& $python coursework/build_pdf.py
+```
+
+The independent check uses `pythermalcomfort==4.8.1` for six nominal profile-zone cases. Expect maximum absolute PMV difference near 0.001497 and PPD difference near 0.0458 percentage points. It writes `verification/independent_pmv_comparison.json`. PDF generation writes `coursework/A3_research_report.pdf`. Chart or pagination bytes may vary with library versions, so inspect numerical labels and tables rather than expecting identical file hashes.
+
+### 6. Check the public tool interactively
+
+Open [PeopleComfort](https://hey-guobaorou.github.io/ARCH7476/peoplecomfort.html) and choose **Reset example**. Confirm 2 zones, 3 profiles, 7 designs and 13 scenarios. Under **Decision comparison**, expect D4 and holdout maximum regret 0.1403. In the thermal ledger expect P1/Z1 PMV near −0.951. Change only Z1 air temperature `ta` from 23.5 to 25, press Tab, and wait for **PMV and results updated**. Expect P1/Z1 near −0.664, selected D3 and holdout maximum regret near 0.0560. Reset and confirm D4 returns. Record the input values beside any result you report.
+
+### 7. Rebuild and use the peer threshold flipbook
+
+The [public flipbook](https://hey-guobaorou.github.io/ARCH7476/week10-threshold/flipbook.html) contains the threshold sweep. Rebuild its files from the A3 engine using the separate site repository and the `draw.py` script supplied with this brief:
+
+```powershell
+Set-Location $reviewRoot
+git clone https://github.com/Hey-Guobaorou/Hey-Guobaorou.github.io.git
+$peerDir = Join-Path $reviewRoot 'Hey-Guobaorou.github.io\ARCH7476\week10-threshold'
+$env:PEOPLECOMFORT_REPO = Join-Path $reviewRoot 'peoplecomfort'
+& $python (Join-Path $peerDir 'draw.py')
+& $python (Join-Path $peerDir 'draw_coverage.py')
+Start-Process (Join-Path $peerDir 'flipbook.html')
+```
+
+`draw.py` regenerates `options.csv`, `epsilon.csv`, `temperature_check.csv`, `threshold.png` and `flipbook.html`. `draw_coverage.py` writes `coverage_strip.png` and `.svg`. Keep Minimum gain at 20% and Allowed excess regret at 0.01. At 75% coverage there is no eligible alternative and the action is Keep D0. At exactly two thirds, D4 is eligible and on the Pareto front. At 50%, D1 and D4 are eligible but D4 dominates D1. The flipbook reuses the A3 holdout outcomes for a retrospective classroom exercise, so its Pareto selection is exploratory.
+
+## Reviewer record
+
+| Item | Peer observation |
+|---|---|
+| Reviewer, date, Python, Node and Git versions | |
+| Checkout commit and A3 input hash | |
+| Smoke check and unit-test outcomes | |
+| Manual S0 D0 regret | |
+| D4 development score and D0/D4 holdout maxima | |
+| Nominal gain, stress pass count and required count | |
+| First confusing instruction or exact error message | |
+| Accepted, revised, rejected or pending claim | |
+| One improvement needed for independent rerun | |
+
+The constructed room, user mixes and action gates test a method. A real layout decision requires local thermal, occupancy, access and actual seat-choice evidence.
 
 ## Brief 1 | Should two seats move?
 
@@ -79,8 +162,3 @@ The frozen 81 conditions form a balanced factorial grid. Keeping D4, D0 and the 
 
 Weather-year, hourly and solar-angle robustness remains untested. The input contains two static indoor environments and no site, dated weather series, occupied-hour schedule, facade geometry or solar-to-indoor radiant model. To run that comparison: fix a site, geometry, HVAC and occupancy schedule; derive hourly Z1/Z2 air and radiant temperatures for each weather year; compare identical occupied windows at full hourly resolution and systematically thinned time steps with different start phases. If direct solar exposure matters, refine sun-position sampling and recompute radiant temperature. For each sampling plan freeze designs and rules, rebuild losses, then report Pareto membership and gate crossings. Record which year or schedule first changes the action. The temperature slices above are sensitivity evidence only.
 
-## Course tool trial and reproduction
-
-[Threshold Explorer](https://caadfutures2025.hku.hk/ARCH7476/site_tools/threshold-explorer.html): with default facade data, moving only the solar gain ceiling from 48 to 38.9 kept Hybrid first (88 vs 85). At 38, Deep fins led (85 vs 75). This was a separate classroom demonstration. The seating flipbook uses PeopleComfort values.
-
-Open flipbook.html offline. For recalculation install matplotlib and Node.js, clone https://github.com/Hey-Guobaorou/peoplecomfort at e097a70664d19c0fbf78a2655350e94f48dc8126 and point r in draw.py at the checkout. Run python draw.py. Source numbers: A3_matrix.csv, options.csv and epsilon.csv. The public report is https://hey-guobaorou.github.io/ARCH7476/a3-peoplecomfort-research.html.
